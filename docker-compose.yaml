@@ -1,6 +1,6 @@
 services:
   mybatis-sns-app:
-    image: mybatis-sns:local
+    image: kilyong/mybatis-sns:latest
     container_name: mybatis-sns-app
     restart: always
     ports:
