@@ -3,16 +3,47 @@ spring:
     name: mybatis-sns
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: 'jdbc:mysql://localhost:3306/sns_db?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true'
-    username: sns-app
-    password: Sns1234!
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/sns_db?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
   config:
     import: optional:application-oauth.yaml
+  # OAuth2 소셜 로그인 설정 (application-oauth.yaml 통합)
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - profile
+              - email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
+            client-authentication-method: client_secret_post
+            authorization-grant-type: authorization_code
+            scope:
+              - profile_nickname
+              - profile_image
+              - account_email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            client-name: Kakao
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
 
   # 데이터베이스 초기화 설정 (애플리케이션 구동 시 schema.sql 및 data.sql 자동 실행)
   sql:
     init:
       mode: always
+
+
 
 # MyBatis 설정
 mybatis:
@@ -24,7 +55,7 @@ mybatis:
     # DB 컬럼명 스네이크 케이스를 자바 카멜 케이스 필드로 자동 변환
     map-underscore-to-camel-case: true
     # 쿼리 실행 로그 콘솔 출력 (개발/테스트 디버깅용)
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 
 # Springdoc OpenAPI 및 Swagger UI 설정
